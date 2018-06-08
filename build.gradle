@@ -1,0 +1,166 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+
+buildscript {
+    
+    repositories {
+        google()
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.1.2'
+        
+
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        jcenter()
+    }
+}
+
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
+
+// 变量,这些变量并不是成员变量，而是定义再方法中的局部变量
+def code = 10
+
+def world = 'world!'
+
+def string = "hello $world"
+
+def multiLines = '''begin
+   line 1
+           line 2
+  end
+'''
+
+
+println string
+println multiLines
+
+println '-----------------方法-------------------'
+// 方法，调用函数时可以不写(),但是有可能会被看成变量,所以使用时最好带上括号，比如println这样的函数，可以不用带
+def testFunction(arg1, arg2){
+    println "this is a function, arg1 = " + arg1 + "  arg2 = " + arg2
+}
+
+testFunction 1, "hehe"
+// 没有返回值类型
+def noneReturnTypeFunc(){
+    // 使用变量code会报错,但是使用string可以，为什么，因为下面的方法叫getString，string被看成了变量，getString使其方法
+    // 所以string = I am a string
+    10 + string
+}
+
+println noneReturnTypeFunc()
+
+import groovy.transform.Field
+@Field field = 'field'//要先导入
+
+def printField(){
+    println field//此时field是成员变量，可以访问了
+}
+
+printField()
+
+// 有返回值类型，String s 要大写，和java一样
+String getString(){
+    return "I am a string"
+}
+
+println getString()
+
+println '-----------------list-------------------'
+// 集合
+def list = [2, 'haha', true]
+// 变量存取：可以直接通过索引存取，而且不用担心索引越界。如果索引超过当前链表长度，List 会自动
+//往该索引添加元素
+assert list[0] == 2
+assert list[5] == null
+list[5] = 5
+println list.size()
+
+list.each {
+    println it
+}
+
+println '-----------------map-------------------'
+def map = ['key1':2,'key2':true,'key3':"haha"]
+// 读取
+println map.key3
+println map['key2']
+// 存放
+map.key4 = 2.5
+map['key5'] = 'hehe'
+map.each {
+    println it
+}
+
+println '-----------------闭包------------------- '
+// 闭包
+/*def xxx = {paramters -> code} //或者
+def xxx = {无参数，纯code} 这种case 不需要->符号*/
+
+def aClosure = {
+    param1, param2->//这个箭头很关键。箭头前面是参数定义，箭头后面是代码,参数可以带类型，比如int param1, String param2
+        println 'this is a closure param1 = ' + param1 + "  param2 = " + param2
+}
+
+aClosure.call(1, 'hello')
+aClosure(1, 'hello')
+
+// 找出所有符合closure中条件的元素
+// 对于一些closure，不知道参数是什么的，可以使用it.来联想可以使用的参数。
+// 比如map的findAll方法中it，就有key和value字段，而List并没有
+def result = map.findAll{
+    it.key == 'key2' || it.value == 2
+}
+
+result.each {
+    println it
+}
+
+println '-----------------io------------------- '
+
+def targetFile = new File('test')
+targetFile.eachLine {
+    println it
+}
+
+def bytes = targetFile.getBytes()
+String fileString = new String(bytes)
+
+def inputStream = targetFile.newInputStream()
+// 要关闭
+inputStream.close()
+//使用闭包操作inputStream，以后在Gradle 里会常看到这种搞法
+targetFile.withInputStream {
+    is->//不用close。Groovy 会自动替你close
+        println is.text
+}
+
+def srcFile = new File('SrcFile')
+targetFile.withOutputStream {
+    os->srcFile.withInputStream {
+        is -> os << is //利用OutputStream 的<<操作符重载，完成从inputstream 到OutputStream
+    }
+}
+// 再evaluation之前执行
+gradle.beforeProject {
+    println 'before project evaluation'
+}
+
+gradle.taskGraph.whenReady {
+    println 'task graph ready'
+}
+
+gradle.buildFinished {
+    println 'build finished'
+}
