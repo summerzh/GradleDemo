@@ -152,15 +152,42 @@ targetFile.withOutputStream {
         is -> os << is //利用OutputStream 的<<操作符重载，完成从inputstream 到OutputStream
     }
 }
-// 再evaluation之前执行
+
+/**
+ * initialization phase初始化阶段就是执行settings.gradle
+ * configuration phase阶段解析每个project的build.gradle。其内部的任务也会被添加到一个有向图里，用于解决执行过程中的依赖关系。
+ * execution phase阶段就是执行task任务。你在gradle xxx 中指定什么任务，gradle 就会将这个xxx任务链上的所有任务全部按依赖顺序执行一遍！
+ */
+
+// 在initialization phase阶段之后在configuration phase之前，evaluation之前执行。
 gradle.beforeProject {
     println 'before project evaluation'
 }
-
+// 在configuration phase阶段， evaluation之后，也就是任务有向图确定后执行
 gradle.taskGraph.whenReady {
     println 'task graph ready'
 }
-
+// execution phase 阶段build完成之后运行
 gradle.buildFinished {
     println 'build finished'
+}
+
+project.getAllprojects().each {
+    println 'project name = ' + it.name
+}
+// 目前root下的build.gradle只有clean一个task
+project.getTasks().each {
+    println it
+}
+
+//project.properties.each {
+//    println it
+//}
+
+println 'gradle hash code = ' + gradle.hashCode()
+println 'home dir = '+gradle.gradleHomeDir
+println 'user home dir = ' + gradle.gradleUserHomeDir
+
+gradle.plugins.each {
+    println it
 }
