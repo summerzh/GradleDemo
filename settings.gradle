@@ -1,1 +1,18 @@
 include ':app'
+
+def func() {
+    println 'I am in settings.gradle'
+}
+
+func()
+
+// 使用ext前缀定义额外的属性
+def initGradleEnvironment(){
+    def properties = new Properties()
+    def propertyFile = new File(rootDir.getAbsolutePath() + "/local.properties")
+    properties.load(propertyFile.newInputStream())
+    gradle.ext.api = properties.getProperty('sdk.api')
+    println 'sdk.api =  ' + gradle.api
+}
+
+initGradleEnvironment()

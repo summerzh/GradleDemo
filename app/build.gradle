@@ -26,3 +26,25 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 }
+
+def func() {
+    println 'I am in app build.gradle'
+}
+func()
+// app下的build.gradle中有许多隐藏的task
+project.getTasks().each {
+    println it
+}
+// project下的所有的属性，并且这些属性可以通过set和get来访问
+//project.properties.each {
+//    println it
+//}
+println 'gradle hash code = ' + gradle.hashCode()
+// C:\Users\用户名\.gradle\wrapper\dists\gradle-4.4-all\9br9xq1tocpiv8o6njlyu5op1\gradle-4.4
+println 'home dir = '+gradle.gradleHomeDir
+// C:\Users\用户名\.gradle
+println 'user home dir = ' + gradle.gradleUserHomeDir
+
+gradle.plugins.each {
+    println it
+}
