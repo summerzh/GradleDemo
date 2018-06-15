@@ -1,19 +1,31 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
+//apply from: rootProject.getRootDir().getAbsolutePath() + "/utils.gradle" //加载uitls.gradle插件
 
+/**
+ * buildScript是用来告诉gradle，我们要用到的plugin在哪里，这样以后才可以使用apply 引用该插件
+ * 如果没有buildScript块，您可以使用Gradle开箱即用的所有东西。
+ * 如果您还想使用第三方插件，任务类或其他类（在构建脚本中！），则必须在buildScript块中指定相应的依赖关系。
+ * 比如使用realm数据库时，我们首先要添加其依赖 classpath "io.realm:realm-gradle-plugin:5.1.0"
+ * 并且在project下的build.gradle中加载该插件 apply plugin: 'realm-android'
+ */
 
 buildscript {
-    
-    repositories {
+
+    repositories {//这是仓库
         google()
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.1.2'
-        
+        classpath 'com.android.tools.build:gradle:3.1.2'// 这是artifact（工件）， 配置在classpath中，
+
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
+
+    // 注意放在此处不可以，放在这里只会打印一次，导致project.getProjectName()都是GradleDemo
+    // 说明buildscript blockscript只会加载一次
+    //apply from: rootProject.getRootDir().getAbsolutePath() + "/utils.gradle" //加载uitls.gradle插件
 }
 
 allprojects {
@@ -21,6 +33,14 @@ allprojects {
         google()
         jcenter()
     }
+    // allprojects配置该project和其子project，适用于所有project
+    // 在该处加载插件，就不需要在所有的project中都加载一遍了
+    apply from: rootProject.getRootDir().getAbsolutePath() + "/utils.gradle" //加载uitls.gradle插件
+}
+
+subprojects {
+    // subprojects 配置所有子project，不会配置根project，所以会导致此处调用project.getProjectName()报错
+    //apply from: rootProject.getRootDir().getAbsolutePath() + "/utils.gradle" //加载uitls.gradle插件
 }
 
 
@@ -160,6 +180,7 @@ targetFile.withOutputStream {
  */
 
 // 在initialization phase阶段之后在configuration phase之前，evaluation之前执行。
+// 该方法会调用多次，会在每个project configuration之前都会调用
 gradle.beforeProject {
     println 'before project evaluation'
 }
@@ -191,3 +212,5 @@ println 'user home dir = ' + gradle.gradleUserHomeDir
 gradle.plugins.each {
     println it
 }
+// 根目录下的build.gradle和project下的build.gradle一样，都会转化成project对象
+println 'project.name = ' + project.getProjectName()//GradleDemo

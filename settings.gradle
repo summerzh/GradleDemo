@@ -1,4 +1,4 @@
-include ':app'
+include ':app', ':mylibrary'
 
 def func() {
     println 'I am in settings.gradle'
@@ -6,10 +6,15 @@ def func() {
 
 func()
 
-// 使用ext前缀定义额外的属性
+// 使用ext前缀定义额外的属性,定义好之后，后面的存取就不需要ext前缀了
+// ext属性支持 Project 和 Gradle 对象。即 Project 和 Gradle 对象 都可以设置 ext 属性
+// 由于gradle对象是全局是唯一的，所以gradle.ext设置的属性可以在各个project都可以使用
+// 而project对象在不同的project中是不同的，所以ext属性是该project独有的
+// 注意不要在local.properties中设置属性，因为该文件一般是要添加到忽略文件中的
+// 可以写在gradle.properties中
 def initGradleEnvironment(){
     def properties = new Properties()
-    def propertyFile = new File(rootDir.getAbsolutePath() + "/local.properties")
+    def propertyFile = new File(rootDir.getAbsolutePath() + "/gradle.properties")
     properties.load(propertyFile.newInputStream())
     gradle.ext.api = properties.getProperty('sdk.api')
     println 'sdk.api =  ' + gradle.api
